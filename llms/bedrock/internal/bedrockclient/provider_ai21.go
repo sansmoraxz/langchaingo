@@ -24,6 +24,8 @@ type ai21TextGenerationInput struct {
 	FrequencyPenalty struct {
 		Scale float64 `json:"scale"`
 	} `json:"frequencyPenalty"`
+
+	NumResults int `json:"numResults,omitempty"`
 }
 
 
@@ -61,6 +63,7 @@ func createAi21Completion(ctx context.Context, client *bedrockruntime.Client, mo
 		FrequencyPenalty: struct {
 			Scale float64 `json:"scale"`
 		}{Scale: 0},
+		NumResults: options.CandidateCount,
 	}
 
 	body, err := json.Marshal(inputContent)
