@@ -41,6 +41,8 @@ func (c *Client) CreateCompletion(ctx context.Context,
 ) (*llms.ContentResponse, error) {
 	provider := getProvider(modelID)
 	switch provider {
+	case "ai21":
+		return createAi21Completion(ctx, c.client, modelID, messages, options)
 	case "amazon":
 		return createAmazonCompletion(ctx, c.client, modelID, messages, options)
 	case "anthropic":
