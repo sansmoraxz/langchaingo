@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
@@ -51,26 +50,10 @@ func createAmazonCompletion(ctx context.Context,
 	messages []Message,
 	options llms.CallOptions,
 ) (*llms.ContentResponse, error) {
-	var messageContent strings.Builder
-	for _, message := range messages {
-		if message.Type != "text" {
-			continue
-		}
-		if message.Role != "" {
-			role, err := getTitanRole(message.Role)
-			if err != nil {
-				return nil, err
-			}
-			messageContent.WriteString(role + ": ")
-		}
-		messageContent.WriteString(message.Content)
-		messageContent.WriteString("\n")
-	}
-
-	messageContent.WriteString("\nBot:")
+	txt := processInputMessagesGeneric(messages)
 
 	inputContent := amazonTextGenerationInput{
-		InputText: messageContent.String(),
+		InputText: txt,
 		TextGenerationConfig: amazonTextGenerationConfigInput{
 			MaxTokens: options.MaxTokens,
 			TopP: options.TopP,

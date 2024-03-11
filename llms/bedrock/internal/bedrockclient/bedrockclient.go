@@ -45,7 +45,24 @@ func (c *Client) CreateCompletion(ctx context.Context,
 		return createAmazonCompletion(ctx, c.client, modelID, messages, options)
 	case "anthropic":
 		return createAnthropicCompletion(ctx, c.client, modelID, messages, options)
+	case "cohere":
+		return createCohereCompletion(ctx, c.client, modelID, messages, options)
 	default:
 		return nil, errors.New("unsupported provider")
 	}
+}
+
+
+func processInputMessagesGeneric(messages []Message) string {
+	var sb strings.Builder
+	for _, message := range messages {
+		if message.Role != "" {
+			sb.WriteString(string(message.Role))
+			sb.WriteString(": ")
+		}
+		if message.Type == "text" {
+			sb.WriteString(message.Content)
+		}
+	}
+	return sb.String()
 }
