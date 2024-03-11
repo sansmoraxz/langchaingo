@@ -31,10 +31,12 @@ type ai21TextGenerationOutput struct {
 	ID any `json:"id"` // Docs say it's a string, got number
 	Prompt struct {
 		Text string `json:"text"`
+		Tokens []struct{} `json:"tokens"` // for counting only
 	} `json:"prompt"`
 	Completions []struct {
 		Data struct {
 			Text string `json:"text"`
+			Tokens []struct{} `json:"tokens"` // for counting only
 		} `json:"data"`
 		FinishReason struct {
 			Reason string `json:"reason"`
@@ -91,6 +93,8 @@ func createAi21Completion(ctx context.Context, client *bedrockruntime.Client, mo
 			StopReason: completion.FinishReason.Reason,
 			GenerationInfo: map[string]any{
 				"id": output.ID,
+				"input_tokens": len(output.Prompt.Tokens),
+				"output_tokens": len(completion.Data.Tokens),
 			},
 		}
 	}
