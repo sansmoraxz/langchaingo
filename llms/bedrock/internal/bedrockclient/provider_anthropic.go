@@ -12,6 +12,90 @@ import (
 )
 
 // Ref: https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-anthropic-claude-messages.html
+// Also: https://docs.anthropic.com/claude/reference/messages_post
+
+// anthropicBinGenerationInputSource is the source of the content
+type anthropicBinGenerationInputSource struct {
+	// The type of the source. Required
+	// One of: "base64"
+	Type string `json:"type"`
+	// The MIME type of the source. Required
+	// One of: []"image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp"]
+	MediaType string `json:"media_type"`
+	// The data of the source. Required
+	// For example if type is "base64" then data is a base64 encoded string
+	Data string `json:"data"`
+}
+
+// anthropicTextGenerationInputContent is a single message in the input
+type anthropicTextGenerationInputContent struct {
+	// The type of the content. Required.
+	// One of: "text", "image"
+	Type string `json:"type"`
+	// The source of the content. Required if type is "image"
+	Source *anthropicBinGenerationInputSource `json:"source,omitempty"`
+	// The text content. Required if type is "text"
+	Text string `json:"text,omitempty"`
+}
+
+type anthropicTextGenerationInputMessage struct {
+	// The role of the message. Required
+	// One of: ["user", "assistant"]
+	// For system prompt, use the system field in the input
+	Role string `json:"role"`
+	// The content of the message. Required
+	Content []anthropicTextGenerationInputContent `json:"content"`
+}
+
+
+// anthropicTextGenerationInput is the input to the model
+type anthropicTextGenerationInput struct {
+	// The version of the model to use. Required
+	AnthropicVersion string `json:"anthropic_version"`
+	// The maximum number of tokens to generate per result. Required
+	MaxTokens int `json:"max_tokens"`
+	// The system prompt to use. Optional
+	System string `json:"system,omitempty"`
+	// The messages to use. Required
+	Messages []*anthropicTextGenerationInputMessage `json:"messages"`
+	// The amount of randomness injected into the response. Optional, default = 1
+	Temperature float64 `json:"temperature,omitempty"`
+	// The probability mass from which tokens are sampled. Optional, default = 1
+	TopP float64 `json:"top_p,omitempty"`
+	// Only sample from the top K options for each subsequent token.
+	// Use top_k to remove long tail low probability responses.
+	// Optional, default = 250
+	TopK int `json:"top_k,omitempty"`
+	// Sequences that will cause the model to stop generating tokens. Optional
+	StopSequences []string `json:"stop_sequences,omitempty"`
+}
+
+
+// anthropicTextGenerationOutput is the generated output
+type anthropicTextGenerationOutput struct {
+	// Type of the content.
+	// For messages, it is "message"
+	Type string `json:"type"`
+	// Conversational role of the generated message.
+	// This will always be "assistant".
+	Role string `json:"role"`
+	// This is an array of content blocks, each of which has a type that determines its shape.
+	// Currently, the only type in responses is "text".
+	Content []struct {
+		Type string `json:"type"`
+		Text string `json:"text"`
+	} `json:"content"`
+	// The reason for the completion of the generation.
+	// One of: ["end_turn", "max_tokens", "stop_sequence"]
+	StopReason string `json:"stop_reason"`
+	// Which custom stop sequence was matched, if any.
+	StopSequence string `json:"stop_sequence"`
+	Usage struct {
+		InputTokens int `json:"input_tokens"`
+		OutputTokens int `json:"output_tokens"`
+	} `json:"usage"`
+}
+
 
 // Finish reason for the completion of the generation
 const (
@@ -19,7 +103,6 @@ const (
 	AnthropicCompletionReasonMaxTokens = "max_tokens"
 	AnthropicCompletionReasonStopSequence = "stop_sequence"
 )
-
 
 // The latest version of the model
 const (
@@ -39,49 +122,6 @@ const (
 	AnthropicMessageTypeImage = "image"
 )
 
-type anthropicTextGenerationInputSource struct {
-	Type string `json:"type"`
-	MediaType string `json:"media_type"`
-	Data string `json:"data"`
-}
-
-type anthropicTextGenerationInputContent struct {
-	Type string `json:"type"`
-	Source *anthropicTextGenerationInputSource `json:"source,omitempty"`
-	Text string `json:"text,omitempty"`
-}
-
-type anthropicTextGenerationInputMessage struct {
-	Role string `json:"role"`
-	Content []anthropicTextGenerationInputContent `json:"content"`
-}
-
-type anthropicTextGenerationInput struct {
-	AnthropicVersion string `json:"anthropic_version"`
-	MaxTokens int `json:"max_tokens"`
-	System string `json:"system,omitempty"`
-	Messages []*anthropicTextGenerationInputMessage `json:"messages"`
-	Temperature float64 `json:"temperature,omitempty"`
-	TopP float64 `json:"top_p,omitempty"`
-	TopK int `json:"top_k,omitempty"`
-	StopSequences []string `json:"stop_sequences,omitempty"`
-}
-
-
-type anthropicTextGenerationOutput struct {
-	Type string `json:"type"`
-	Role string `json:"role"`
-	Content []struct {
-		Type string `json:"type"`
-		Text string `json:"text"`
-	} `json:"content"`
-	StopReason string `json:"stop_reason"`
-	StopSequence string `json:"stop_sequence"`
-	Usage struct {
-		InputTokens int `json:"input_tokens"`
-		OutputTokens int `json:"output_tokens"`
-	} `json:"usage"`
-}
 
 func createAnthropicCompletion(ctx context.Context,
 	client *bedrockruntime.Client,
@@ -208,7 +248,7 @@ func getAnthropicInputContent(message Message) anthropicTextGenerationInputConte
 	} else if message.Type == "image" {
 		c = anthropicTextGenerationInputContent{
 			Type: message.Type,
-			Source: &anthropicTextGenerationInputSource{
+			Source: &anthropicBinGenerationInputSource{
 				Type:      message.Type,
 				MediaType: message.MimeType,
 				Data:      message.Content,
