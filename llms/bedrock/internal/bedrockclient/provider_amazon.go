@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
@@ -21,14 +22,16 @@ const (
 // https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-titan-text.html
 
 
+type amazonTextGenerationConfigInput struct {
+	MaxTokens int `json:"maxTokenCount"`
+	TopP float64 `json:"topP"`
+	Temperature float64 `json:"temperature"`
+	StopSequences []string `json:"stopSequences"`
+}
+
 type amazonTextGenerationInput struct {
 	InputText string `json:"inputText"`
-	TextGenerationConfig struct {
-		MaxTokens int `json:"maxTokenCount"`
-		TopP float32 `json:"topP"`
-		Temperature float32 `json:"temperature"`
-		StopSequences []string `json:"stopSequences"`
-	} `json:"textGenerationConfig"`
+	TextGenerationConfig amazonTextGenerationConfigInput `json:"textGenerationConfig"`
 }
 
 
@@ -44,8 +47,31 @@ type amazonTextGenerationOutput struct {
 func createAmazonCompletion(ctx context.Context,
 	client *bedrockruntime.Client,
 	modelID string,
-	inputContent amazonTextGenerationInput,
+	messages []Message,
+	options llms.CallOptions,
 ) (*llms.ContentResponse, error) {
+	var messageContent strings.Builder
+	for _, message := range messages {
+		if message.Type != "text" {
+			continue
+		}
+		if message.Role != "" {
+			messageContent.WriteString(string(message.Role) + ": ")
+		}
+		messageContent.WriteString(message.Content)
+		messageContent.WriteString("\n")
+	}
+
+	inputContent := amazonTextGenerationInput{
+		InputText: messageContent.String(),
+		TextGenerationConfig: amazonTextGenerationConfigInput{
+			MaxTokens: options.MaxTokens,
+			TopP: options.TopP,
+			Temperature: options.Temperature,
+			StopSequences: options.StopWords,
+		},
+	}
+
 	body, err := json.Marshal(inputContent)
 	if err != nil {
 		return nil, err

@@ -1,0 +1,53 @@
+package bedrockclient
+
+import (
+	"context"
+	"errors"
+	"strings"
+
+	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
+	"github.com/tmc/langchaingo/llms"
+	"github.com/tmc/langchaingo/schema"
+)
+
+type Client struct {
+	ModelId string
+	client *bedrockruntime.Client
+}
+
+type Message struct {
+	Role schema.ChatMessageType
+	Content string
+	// Type may be "text" or "image"
+	Type string
+	// MimeType is the MIME type
+	MimeType string
+}
+
+func getProvider(modelID string) string {
+	return strings.Split(modelID, ".")[0]
+}
+
+
+func NewClient(modelId string, client *bedrockruntime.Client) *Client {
+	return &Client{
+		ModelId: modelId,
+		client: client,
+	}
+}
+
+func (c *Client) CreateCompletion(ctx context.Context,
+	modelID string,
+	messages []Message,
+	options llms.CallOptions,
+) (*llms.ContentResponse, error) {
+	provider := getProvider(modelID)
+	switch provider {
+	case "amazon":
+		return createAmazonCompletion(ctx, c.client, modelID, messages, options)
+	case "anthropic":
+		return createAnthropicCompletion(ctx, c.client, modelID, messages, options)
+	default:
+		return nil, errors.New("unsupported provider")
+	}
+}

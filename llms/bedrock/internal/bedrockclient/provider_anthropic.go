@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
 	"github.com/tmc/langchaingo/llms"
+	"github.com/tmc/langchaingo/schema"
 )
 
 // Ref: https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-anthropic-claude-messages.html
@@ -27,6 +28,7 @@ const (
 
 // Role attribute for the anthropic message
 const (
+	AnthropicSystem = "system"
 	AnthropicRoleUser = "user"
 	AnthropicRoleAssistant = "assistant"
 )
@@ -57,11 +59,10 @@ type anthropicTextGenerationInputMessage struct {
 type anthropicTextGenerationInput struct {
 	AnthropicVersion string `json:"anthropic_version"`
 	MaxTokens int `json:"max_tokens"`
-	// older versions may not have this field
 	System *string `json:"system,omitempty"`
 	Messages []*anthropicTextGenerationInputMessage `json:"messages"`
-	Temperature float32 `json:"temperature"`
-	TopP float32 `json:"top_p"`
+	Temperature float64 `json:"temperature"`
+	TopP float64 `json:"top_p"`
 	TopK int `json:"top_k"`
 	StopSequences []string `json:"stop_sequences"`
 }
@@ -85,9 +86,43 @@ type anthropicTextGenerationOutput struct {
 func createAnthropicCompletion(ctx context.Context,
 	client *bedrockruntime.Client,
 	modelID string,
-	inputContent anthropicTextGenerationInput,
+	messages []Message,
+	options llms.CallOptions,
 ) (*llms.ContentResponse, error) {
-	body, err := json.Marshal(inputContent)
+	 inputContents := make([]*anthropicTextGenerationInputMessage , 0, len(messages))
+	 var systemPrompt *string
+	 for _, message := range messages {
+		role, err := getAnthropicRole(message.Role)
+		if err != nil {
+			return nil, err
+		}
+		c := getAnthropicInputContent(message)
+
+		if role == AnthropicSystem {
+			if systemPrompt != nil {
+				return nil, errors.New("multiple system prompts")
+			}
+			systemPrompt = c.Text
+		} else {
+			inputContents = append(inputContents, &anthropicTextGenerationInputMessage{
+				Role: role,
+				Content: []anthropicTextGenerationInputContent{c},
+			})
+		}
+	}
+
+	input := anthropicTextGenerationInput{
+		AnthropicVersion: AnthropicLatestVersion,
+		MaxTokens: options.MaxTokens,
+		System: systemPrompt,
+		Messages: inputContents,
+		Temperature: options.Temperature,
+		TopP: options.TopP,
+		TopK: options.TopK,
+		StopSequences: options.StopWords,
+	}
+
+	body, err := json.Marshal(input)
 	if err != nil {
 		return nil, err
 	}
@@ -128,4 +163,43 @@ func createAnthropicCompletion(ctx context.Context,
 	return &llms.ContentResponse{
 		Choices: Contentchoices,
 	}, nil
+}
+
+func getAnthropicRole(role schema.ChatMessageType) (string, error) {
+	switch role {
+	case schema.ChatMessageTypeSystem:
+		return AnthropicSystem, nil
+
+	case schema.ChatMessageTypeFunction:
+		fallthrough
+	case schema.ChatMessageTypeAI:
+		return AnthropicRoleAssistant, nil
+
+	case schema.ChatMessageTypeGeneric:
+		fallthrough
+	case schema.ChatMessageTypeHuman:
+		return AnthropicRoleUser, nil
+	default:
+		return "", errors.New("unsupported role")
+	}
+}
+
+func getAnthropicInputContent(message Message) anthropicTextGenerationInputContent {
+	var c anthropicTextGenerationInputContent
+	if message.Type == "text" {
+		c = anthropicTextGenerationInputContent{
+			Type: message.Type,
+			Text: &message.Content,
+		}
+	} else if message.Type == "image" {
+		c = anthropicTextGenerationInputContent{
+			Type: message.Type,
+			Source: &anthropicTextGenerationInputSource{
+				Type:      message.Type,
+				MediaType: message.MimeType,
+				Data:      message.Content,
+			},
+		}
+	}
+	return c
 }
