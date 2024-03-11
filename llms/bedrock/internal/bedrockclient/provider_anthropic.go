@@ -89,7 +89,7 @@ func createAnthropicCompletion(ctx context.Context,
 	messages []Message,
 	options llms.CallOptions,
 ) (*llms.ContentResponse, error) {
-	inputContents, systemPrompt, err := processInputMessagesForAnthropic(messages)
+	inputContents, systemPrompt, err := processInputMessagesAnthropic(messages)
 	if err != nil {
 		return nil, err
 	}
@@ -148,11 +148,14 @@ func createAnthropicCompletion(ctx context.Context,
 	}, nil
 }
 
-func processInputMessagesForAnthropic(messages []Message) ([]*anthropicTextGenerationInputMessage, *string, error) {
+func processInputMessagesAnthropic(messages []Message) ([]*anthropicTextGenerationInputMessage, *string, error) {
 	inputContents := make([]*anthropicTextGenerationInputMessage, 0, len(messages))
 	var systemPrompt *string
 	for _, message := range messages {
-		role := getAnthropicRole(message.Role)
+		role, err := getAnthropicRole(message.Role)
+		if err != nil {
+			return nil, nil, err
+		}
 		c := getAnthropicInputContent(message)
 
 		if role == AnthropicSystem {
@@ -172,22 +175,23 @@ func processInputMessagesForAnthropic(messages []Message) ([]*anthropicTextGener
 
 
 // process the role of the message to anthropic supported role
-func getAnthropicRole(role schema.ChatMessageType) string {
+func getAnthropicRole(role schema.ChatMessageType) (string, error) {
 	switch role {
 	case schema.ChatMessageTypeSystem:
-		return AnthropicSystem
+		return AnthropicSystem, nil
 
-	case schema.ChatMessageTypeFunction:
-		fallthrough
 	case schema.ChatMessageTypeAI:
-		return AnthropicRoleAssistant
+		return AnthropicRoleAssistant, nil
 
 	case schema.ChatMessageTypeGeneric:
 		fallthrough
 	case schema.ChatMessageTypeHuman:
+		return AnthropicRoleUser, nil
+
+	case schema.ChatMessageTypeFunction:
 		fallthrough
 	default:
-		return AnthropicRoleUser
+		return "", errors.New("role not supported")
 	}
 }
 
