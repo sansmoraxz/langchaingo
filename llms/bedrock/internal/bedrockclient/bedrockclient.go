@@ -11,7 +11,6 @@ import (
 )
 
 type Client struct {
-	ModelId string
 	client *bedrockruntime.Client
 }
 
@@ -29,9 +28,8 @@ func getProvider(modelID string) string {
 }
 
 
-func NewClient(modelId string, client *bedrockruntime.Client) *Client {
+func NewClient(client *bedrockruntime.Client) *Client {
 	return &Client{
-		ModelId: modelId,
 		client: client,
 	}
 }
