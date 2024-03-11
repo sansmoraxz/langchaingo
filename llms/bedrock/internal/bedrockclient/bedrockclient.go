@@ -47,6 +47,8 @@ func (c *Client) CreateCompletion(ctx context.Context,
 		return createAnthropicCompletion(ctx, c.client, modelID, messages, options)
 	case "cohere":
 		return createCohereCompletion(ctx, c.client, modelID, messages, options)
+	case "meta":
+		return createMetaCompletion(ctx, c.client, modelID, messages, options)
 	default:
 		return nil, errors.New("unsupported provider")
 	}
