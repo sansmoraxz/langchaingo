@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
 	"github.com/tmc/langchaingo/llms"
-	"github.com/tmc/langchaingo/schema"
 )
 
 
@@ -104,25 +103,4 @@ func createAmazonCompletion(ctx context.Context,
 	return &llms.ContentResponse{
 		Choices: contentChoices,
 	}, nil
-}
-
-
-func getTitanRole(role schema.ChatMessageType) (string, error) {
-	switch role {
-	case schema.ChatMessageTypeSystem:
-		return "System", nil
-
-	case schema.ChatMessageTypeAI:
-		return "Bot", nil
-
-	case schema.ChatMessageTypeGeneric:
-		fallthrough
-	case schema.ChatMessageTypeHuman:
-		return "User", nil
-
-	case schema.ChatMessageTypeFunction:
-		fallthrough
-	default:
-		return "", errors.New("role not supported")
-	}
 }
