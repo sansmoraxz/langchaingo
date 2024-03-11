@@ -14,12 +14,12 @@ import (
 
 type cohereTextGenerationInput struct {
 	Prompt string `json:"prompt"`
-	Temperature float64 `json:"temperature"`
-	P float64 `json:"p"`
-	K int `json:"k"`
-	MaxTokens int `json:"max_tokens"`
-	StopSequences []string `json:"stop_sequences"`
-	NumGenerations int `json:"num_generations"`
+	Temperature float64 `json:"temperature,omitempty"`
+	P float64 `json:"p,omitempty"`
+	K int `json:"k,omitempty"`
+	MaxTokens int `json:"max_tokens,omitempty"`
+	StopSequences []string `json:"stop_sequences,omitempty"`
+	NumGenerations int `json:"num_generations,omitempty"`
 }
 
 
