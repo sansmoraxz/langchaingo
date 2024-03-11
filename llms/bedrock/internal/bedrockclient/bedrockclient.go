@@ -55,14 +55,21 @@ func (c *Client) CreateCompletion(ctx context.Context,
 
 func processInputMessagesGeneric(messages []Message) string {
 	var sb strings.Builder
+	var hasRole bool
 	for _, message := range messages {
 		if message.Role != "" {
+			hasRole = true
+			sb.WriteString("\n")
 			sb.WriteString(string(message.Role))
 			sb.WriteString(": ")
 		}
 		if message.Type == "text" {
 			sb.WriteString(message.Content)
 		}
+	}
+	if hasRole {
+		sb.WriteString("\n")
+		sb.WriteString("AI: ")
 	}
 	return sb.String()
 }
