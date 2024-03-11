@@ -9,17 +9,33 @@ import (
 	"github.com/tmc/langchaingo/llms"
 )
 
+// Ref: https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-meta.html
+
+// metaTextGenerationInput is the input to the model
 type metaTextGenerationInput struct {
+	// The prompt that you want to pass to the model. Required
 	Prompt string  `json:"prompt"`
+	// Used to control the randomness of the generation. Optional, default = 0.5
 	Temperature float64 `json:"temperature"`
+	// Used to lower value to ignore less probable options. Optional, default = 0.9
 	TopP float64 `json:"top_p"`
+	// The maximum number of tokens to generate per result.
+	// The model truncates the response once the generated text exceeds max_gen_len.
+	// Optional, default = 512
 	MaxGenLen int `json:"max_gen_len"`
 }
 
+
+// metaTextGenerationOutput is the output from the model
 type metaTextGenerationOutput struct {
+	// The generated text.
 	Generation string `json:"generation"`
+	// The number of tokens in the prompt.
 	PromptTokenCount int `json:"prompt_token_count"`
+	// The number of tokens in the generated text.
 	GenerationTokenCount int `json:"generation_token_count"`
+	// The reason why the response stopped generating text.
+	// One of: ["stop", "length"]
 	StopReason string `json:"stop_reason"`
 }
 
