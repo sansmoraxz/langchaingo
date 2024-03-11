@@ -148,6 +148,9 @@ func createAnthropicCompletion(ctx context.Context,
 	}, nil
 }
 
+
+// process the input messages to anthropic supported input
+// returns the input content and system prompt
 func processInputMessagesAnthropic(messages []Message) ([]*anthropicTextGenerationInputMessage, string, error) {
 	inputContents := make([]*anthropicTextGenerationInputMessage, 0, len(messages))
 	var systemPrompt string
