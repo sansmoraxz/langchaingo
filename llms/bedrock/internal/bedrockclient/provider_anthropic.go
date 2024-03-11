@@ -48,7 +48,7 @@ type anthropicTextGenerationInputSource struct {
 type anthropicTextGenerationInputContent struct {
 	Type string `json:"type"`
 	Source *anthropicTextGenerationInputSource `json:"source,omitempty"`
-	Text *string `json:"text,omitempty"`
+	Text string `json:"text,omitempty"`
 }
 
 type anthropicTextGenerationInputMessage struct {
@@ -59,12 +59,12 @@ type anthropicTextGenerationInputMessage struct {
 type anthropicTextGenerationInput struct {
 	AnthropicVersion string `json:"anthropic_version"`
 	MaxTokens int `json:"max_tokens"`
-	System *string `json:"system,omitempty"`
+	System string `json:"system,omitempty"`
 	Messages []*anthropicTextGenerationInputMessage `json:"messages"`
-	Temperature float64 `json:"temperature"`
-	TopP float64 `json:"top_p"`
-	TopK int `json:"top_k"`
-	StopSequences []string `json:"stop_sequences"`
+	Temperature float64 `json:"temperature,omitempty"`
+	TopP float64 `json:"top_p,omitempty"`
+	TopK int `json:"top_k,omitempty"`
+	StopSequences []string `json:"stop_sequences,omitempty"`
 }
 
 
@@ -96,7 +96,7 @@ func createAnthropicCompletion(ctx context.Context,
 
 	input := anthropicTextGenerationInput{
 		AnthropicVersion: AnthropicLatestVersion,
-		MaxTokens: options.MaxTokens,
+		MaxTokens: options.MaxTokens | 200, // this is a required field
 		System: systemPrompt,
 		Messages: inputContents,
 		Temperature: options.Temperature,
@@ -148,19 +148,19 @@ func createAnthropicCompletion(ctx context.Context,
 	}, nil
 }
 
-func processInputMessagesAnthropic(messages []Message) ([]*anthropicTextGenerationInputMessage, *string, error) {
+func processInputMessagesAnthropic(messages []Message) ([]*anthropicTextGenerationInputMessage, string, error) {
 	inputContents := make([]*anthropicTextGenerationInputMessage, 0, len(messages))
-	var systemPrompt *string
+	var systemPrompt string
 	for _, message := range messages {
 		role, err := getAnthropicRole(message.Role)
 		if err != nil {
-			return nil, nil, err
+			return nil, "", err
 		}
 		c := getAnthropicInputContent(message)
 
 		if role == AnthropicSystem {
-			if systemPrompt != nil {
-				return nil, nil, errors.New("multiple system prompts")
+			if systemPrompt != "" {
+				return nil, "", errors.New("multiple system prompts")
 			}
 			systemPrompt = c.Text
 		} else {
@@ -200,7 +200,7 @@ func getAnthropicInputContent(message Message) anthropicTextGenerationInputConte
 	if message.Type == "text" {
 		c = anthropicTextGenerationInputContent{
 			Type: message.Type,
-			Text: &message.Content,
+			Text: message.Content,
 		}
 	} else if message.Type == "image" {
 		c = anthropicTextGenerationInputContent{
