@@ -9,38 +9,64 @@ import (
 	"github.com/tmc/langchaingo/llms"
 )
 
+// Ref: https://docs.ai21.com/reference/j2-complete-ref
+
+
 type ai21TextGenerationInput struct {
+	// The text which the model is requested to continue.
 	Prompt string `json:"prompt"`
+	// Modifies the distribution from which tokens are sampled. Optional, default = 0.7
 	Temperature float64 `json:"temperature,omitempty"`
+	// Sample tokens from the corresponding top percentile of probability mass. Optional, default = 1
 	TopP float64 `json:"topP,omitempty"`
+	// The maximum number of tokens to generate per result. Optional, default = 16
 	MaxTokens int `json:"maxTokens,omitempty"`
+	// Stops decoding if any of the strings is generated. Optional.
 	StopSequences []string `json:"stopSequences,omitempty"`
+
+	// The scale factor for the count penalty
 	CountPenalty struct {
 		Scale float64 `json:"scale"`
 	} `json:"countPenalty"`
+	// The scale factor for the presence penalty
 	PresencePenalty struct {
 		Scale float64 `json:"scale"`
 	} `json:"presencePenalty"`
+	// The scale factor for the frequency penalty
 	FrequencyPenalty struct {
 		Scale float64 `json:"scale"`
 	} `json:"frequencyPenalty"`
 
+	// The number of results to generate. Optional, default = 1
 	NumResults int `json:"numResults,omitempty"`
 }
 
 
 type ai21TextGenerationOutput struct {
+	// The ID of the request
 	ID any `json:"id"` // Docs say it's a string, got number
+	// The prompt that was used for the request
+
+	// The input fields of the request (minified)
 	Prompt struct {
-		Text string `json:"text"`
+		// The input tokens
 		Tokens []struct{} `json:"tokens"` // for counting only
 	} `json:"prompt"`
+
+	// The completions of the request (minified)
 	Completions []struct {
+		// The generated data
 		Data struct {
+			// The generated text
 			Text string `json:"text"`
+			// The generated tokens
 			Tokens []struct{} `json:"tokens"` // for counting only
 		} `json:"data"`
+
+		// The reason the generation was stopped
 		FinishReason struct {
+			// The reason the generation was stopped
+			// Can be "length", "stop", "endoftext"
 			Reason string `json:"reason"`
 		} `json:"finishReason"`
 	} `json:"completions"`
