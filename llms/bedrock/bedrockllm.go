@@ -64,7 +64,9 @@ func (l *LLM) GenerateContent(ctx context.Context, messages []llms.MessageConten
 		l.CallbacksHandler.HandleLLMGenerateContentStart(ctx, messages)
 	}
 
-	opts := llms.CallOptions{}
+	opts := llms.CallOptions{
+		Model: l.modelId,
+	}
 	for _, opt := range options {
 		opt(&opts)
 	}
@@ -74,7 +76,7 @@ func (l *LLM) GenerateContent(ctx context.Context, messages []llms.MessageConten
 		return nil, err
 	}
 
-	res, err := l.client.CreateCompletion(ctx, l.modelId, m, opts)
+	res, err := l.client.CreateCompletion(ctx, opts.Model, m, opts)
 
 	if err != nil {
 		if l.CallbacksHandler != nil {

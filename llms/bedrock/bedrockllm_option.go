@@ -20,6 +20,13 @@ func WithModel(modelId string) Option {
 	}
 }
 
+// WithClient allows setting a custom bedrockruntime.Client.
+func WithClient(client *bedrockruntime.Client) Option {
+	return func(o *options) {
+		o.client = client
+	}
+}
+
 
 // WithCallback allows setting a custom Callback Handler.
 func WithCallback(callbackHandler callbacks.Handler) Option {
