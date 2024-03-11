@@ -94,7 +94,7 @@ func (l *LLM) GenerateContent(ctx context.Context, messages []llms.MessageConten
 
 
 func processMessages(messages []llms.MessageContent) ([]bedrockclient.Message, error) {
-	bedrockMsgs := make([]bedrockclient.Message, len(messages))
+	bedrockMsgs := make([]bedrockclient.Message, 0, len(messages))
 
 	for _, m := range messages {
 		for _, part := range m.Parts {
@@ -116,7 +116,7 @@ func processMessages(messages []llms.MessageContent) ([]bedrockclient.Message, e
 				return nil, errors.New("unsupported message type")
 			}
 		}
-		}
+	}
 	return bedrockMsgs, nil
 }
 
