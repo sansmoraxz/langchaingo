@@ -10,29 +10,44 @@ import (
 )
 
 // Ref: https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-cohere-command.html
-
+// Also: https://docs.cohere.com/reference/generate
 
 type cohereTextGenerationInput struct {
+	// The prompt that you want to pass to the model. Required
 	Prompt string `json:"prompt"`
+	// Use a lower value to decrease randomness in the response. Optional, default = 0.9
 	Temperature float64 `json:"temperature,omitempty"`
+	// Use a lower value to ignore less probable options. Optional, default = 0.75
 	P float64 `json:"p,omitempty"`
+	// Specify the number of token choices the model uses to generate the next token.
+	// If both p and k are enabled, p acts after k
+	// Optional, default = 0
 	K int `json:"k,omitempty"`
+	// Specify the maximum number of tokens to use in the generated response.
+	// Optional, default = 20
 	MaxTokens int `json:"max_tokens,omitempty"`
+	// Configure up to four sequences that the model recognizes. After a stop sequence, the model stops generating further tokens.
+	// The returned text doesn't contain the stop sequence.
 	StopSequences []string `json:"stop_sequences,omitempty"`
 	NumGenerations int `json:"num_generations,omitempty"`
 }
 
 
 type cohereTextGenerationOutput struct {
-	Generations []*cohereTextGenerationOutputGeneration `json:"generations"`
+	// The ID of the response.
 	ID string `json:"id"`
-	Prompt string `json:"prompt"`
+	// The generations of the response.
+	Generations []*cohereTextGenerationOutputGeneration `json:"generations"`
 }
 
 type cohereTextGenerationOutputGeneration struct {
+	// The ID of the generation.
 	ID string `json:"id"`
+	// The index of the generation.
 	Index int `json:"index"`
+	// The reason the generation finished.
 	FinishReason string `json:"finish_reason"`
+	// The text of the generation.
 	Text string `json:"text"`
 }
 
