@@ -22,10 +22,10 @@ const (
 
 
 type amazonTextGenerationConfigInput struct {
-	MaxTokens int `json:"maxTokenCount"`
-	TopP float64 `json:"topP"`
-	Temperature float64 `json:"temperature"`
-	StopSequences []string `json:"stopSequences"`
+	MaxTokens int `json:"maxTokenCount,omitempty"`
+	TopP float64 `json:"topP,omitempty"`
+	Temperature float64 `json:"temperature,omitempty"`
+	StopSequences []string `json:"stopSequences,omitempty"`
 }
 
 type amazonTextGenerationInput struct {
