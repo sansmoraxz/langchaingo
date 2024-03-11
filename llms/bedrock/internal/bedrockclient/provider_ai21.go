@@ -66,11 +66,20 @@ type ai21TextGenerationOutput struct {
 		// The reason the generation was stopped
 		FinishReason struct {
 			// The reason the generation was stopped
-			// Can be "length", "stop", "endoftext"
+			// One of: "length", "stop", "endoftext"
 			Reason string `json:"reason"`
 		} `json:"finishReason"`
 	} `json:"completions"`
 }
+
+
+// Finish reason for the completion of the generation for AI21 Models
+const (
+	Ai21CompletionReasonLength = "length"
+	Ai21CompletionReasonStop = "stop"
+	Ai21CompletionReasonEndOfText = "endoftext"
+)
+
 
 func createAi21Completion(ctx context.Context, client *bedrockruntime.Client, modelID string, messages []Message, options llms.CallOptions) (*llms.ContentResponse, error) {
 	txt := processInputMessagesGeneric(messages)
