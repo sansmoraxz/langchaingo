@@ -74,6 +74,7 @@ const (
 	Ai21CompletionReasonStop      = "stop"
 	Ai21CompletionReasonEndOfText = "endoftext"
 )
+
 func createAi21Completion(ctx context.Context, client *bedrockruntime.Client, modelID string, messages []Message, options llms.CallOptions) (*llms.ContentResponse, error) {
 	txt := processInputMessagesGeneric(messages)
 	inputContent := ai21TextGenerationInput{

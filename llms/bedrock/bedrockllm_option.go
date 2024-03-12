@@ -14,9 +14,9 @@ type options struct {
 }
 
 // WithModel allows setting a custom modelId.
-func WithModel(modelId string) Option {
+func WithModel(modelID string) Option {
 	return func(o *options) {
-		o.modelId = modelId
+		o.modelId = modelID
 	}
 }
 

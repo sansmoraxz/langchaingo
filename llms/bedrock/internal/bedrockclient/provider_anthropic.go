@@ -46,6 +46,7 @@ type anthropicTextGenerationInputMessage struct {
 	// The content of the message. Required
 	Content []anthropicTextGenerationInputContent `json:"content"`
 }
+
 // anthropicTextGenerationInput is the input to the model.
 type anthropicTextGenerationInput struct {
 	// The version of the model to use. Required
@@ -117,6 +118,7 @@ const (
 	AnthropicMessageTypeText  = "text"
 	AnthropicMessageTypeImage = "image"
 )
+
 func createAnthropicCompletion(ctx context.Context,
 	client *bedrockruntime.Client,
 	modelID string,
@@ -181,6 +183,7 @@ func createAnthropicCompletion(ctx context.Context,
 		Choices: Contentchoices,
 	}, nil
 }
+
 // process the input messages to anthropic supported input
 // returns the input content and system prompt.
 func processInputMessagesAnthropic(messages []Message) ([]*anthropicTextGenerationInputMessage, string, error) {

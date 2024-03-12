@@ -14,7 +14,7 @@ import (
 const defaultModel = "amazon.titan-text-lite-v1"
 
 type LLM struct {
-	modelId          string
+	modelID          string
 	client           *bedrockclient.Client
 	CallbacksHandler callbacks.Handler
 }
@@ -26,7 +26,7 @@ func New(opts ...Option) (*LLM, error) {
 	}
 	return &LLM{
 		client:           c,
-		modelId:          o.modelId,
+		modelID:          o.modelId,
 		CallbacksHandler: o.callbackHandler,
 	}, nil
 }
@@ -50,6 +50,7 @@ func newClient(opts ...Option) (*options, *bedrockclient.Client, error) {
 
 	return options, bedrockclient.NewClient(options.client), nil
 }
+
 // Call implements llms.Model.
 func (l *LLM) Call(ctx context.Context, prompt string, options ...llms.CallOption) (string, error) {
 	return llms.GenerateFromSinglePrompt(ctx, l, prompt, options...)
@@ -62,7 +63,7 @@ func (l *LLM) GenerateContent(ctx context.Context, messages []llms.MessageConten
 	}
 
 	opts := llms.CallOptions{
-		Model: l.modelId,
+		Model: l.modelID,
 	}
 	for _, opt := range options {
 		opt(&opts)

@@ -32,6 +32,7 @@ type cohereTextGenerationInput struct {
 	StopSequences  []string `json:"stop_sequences,omitempty"`
 	NumGenerations int      `json:"num_generations,omitempty"`
 }
+
 // Finish reason for the completion of the generation for Cohere Models.
 const (
 	CohereCompletionReasonComplete   = "COMPLETE"
@@ -47,6 +48,7 @@ type cohereTextGenerationOutput struct {
 	// The generations of the response.
 	Generations []*cohereTextGenerationOutputGeneration `json:"generations"`
 }
+
 // cohereTextGenerationOutputGeneration is the generation output for the text generation for Cohere Models.
 type cohereTextGenerationOutputGeneration struct {
 	// The ID of the generation.

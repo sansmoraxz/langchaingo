@@ -26,6 +26,7 @@ type Message struct {
 func getProvider(modelID string) string {
 	return strings.Split(modelID, ".")[0]
 }
+
 func NewClient(client *bedrockruntime.Client) *Client {
 	return &Client{
 		client: client,

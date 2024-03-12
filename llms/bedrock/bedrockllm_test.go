@@ -26,6 +26,7 @@ var msgs []llms.MessageContent = []llms.MessageContent{
 		},
 	},
 }
+
 // All the test models.
 var models = []string{
 	bedrock.ModelAi21J2MidV1,
@@ -52,6 +53,8 @@ func setUpTest() (*bedrockruntime.Client, error) {
 }
 
 func TestAmazonOutput(t *testing.T) {
+	t.Parallel()
+
 	client, err := setUpTest()
 	if err != nil {
 		t.Fatal(err)

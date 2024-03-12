@@ -24,6 +24,7 @@ type metaTextGenerationInput struct {
 	// Optional, default = 512
 	MaxGenLen int `json:"max_gen_len,omitempty"`
 }
+
 // metaTextGenerationOutput is the output from the model.
 type metaTextGenerationOutput struct {
 	// The generated text.
