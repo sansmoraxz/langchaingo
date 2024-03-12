@@ -12,7 +12,7 @@ import (
 
 // Ref: https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-titan-text.html
 
-
+// amazonTextGenerationConfigInput is the input for the text generation configuration for Amazon Models
 type amazonTextGenerationConfigInput struct {
 	// The maximum number of tokens to generate per result. Optional, default = 512
 	MaxTokens int `json:"maxTokenCount,omitempty"`
@@ -25,6 +25,8 @@ type amazonTextGenerationConfigInput struct {
 	StopSequences []string `json:"stopSequences,omitempty"`
 }
 
+
+// amazonTextGenerationInput is the input for the text generation for Amazon Models
 type amazonTextGenerationInput struct {
 	// The text which the model is requested to continue.
 	InputText string `json:"inputText"`
@@ -33,6 +35,8 @@ type amazonTextGenerationInput struct {
 }
 
 
+
+// amazonTextGenerationOutput is the output for the text generation for Amazon Models
 type amazonTextGenerationOutput struct {
 	// The number of tokens in the prompt
 	InputTextTokenCount int `json:"inputTextTokenCount"`
