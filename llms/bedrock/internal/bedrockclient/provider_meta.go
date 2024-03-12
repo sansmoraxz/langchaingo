@@ -39,6 +39,12 @@ type metaTextGenerationOutput struct {
 	StopReason string `json:"stop_reason"`
 }
 
+// Finish reason for the completion of the generation
+const (
+	MetaCompletionReasonStop = "stop"
+	MetaCompletionReasonLength = "length"
+)
+
 func createMetaCompletion(ctx context.Context,
 	client *bedrockruntime.Client,
 	modelID string,
