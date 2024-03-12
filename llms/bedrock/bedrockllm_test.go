@@ -16,7 +16,7 @@ var msgs []llms.MessageContent = []llms.MessageContent{
 	{
 		Role: schema.ChatMessageTypeSystem,
 		Parts: []llms.ContentPart{
-			llms.TextPart("You are a chatbot."),
+			llms.TextPart("You know all about AI."),
 		},
 	},
 	{
@@ -70,13 +70,13 @@ func TestAmazonOutput(t *testing.T) {
 		fmt.Println("--------------------------------------------------")
 		fmt.Printf("Model: %s\n", model)
 
-		resp, err := llm.GenerateContent(ctx, msgs, llms.WithModel(model))
+		resp, err := llm.GenerateContent(ctx, msgs, llms.WithModel(model), llms.WithMaxTokens(512))
 		if err != nil {
 			t.Fatal(err)
 		}
 		for i, choice := range resp.Choices {
-			fmt.Printf("Choice %d:\n", i)
-			fmt.Printf("  Text: %s\n", choice.Content)
+			fmt.Printf("Choice %d:-\n", i)
+			fmt.Printf("%s\n", choice.Content)
 		}
 
 		fmt.Println("--------------------------------------------------")

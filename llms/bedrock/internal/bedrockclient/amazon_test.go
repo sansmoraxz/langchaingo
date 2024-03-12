@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
 	"github.com/tmc/langchaingo/llms"
+	"github.com/tmc/langchaingo/schema"
 )
 
 func TestFetchAmazonOutput(t *testing.T) {
@@ -18,28 +19,33 @@ func TestFetchAmazonOutput(t *testing.T) {
 	client := bedrockruntime.NewFromConfig(cfg)
 
 	c := NewClient(client)
-	msg := Message{
-		// Role: "Human",
-		Content: "Who is the second president of the United States?",
-		Type: "text",
+	msg := []Message{
+		{
+			Role: "User",
+			Content: "Who is the second president of the United States?",
+			Type: "text",
+		},
 	}
 
-	modelId := "amazon.titan-text-lite-v1"
+	modelId := "meta.llama2-13b-chat-v1"
 
 	opts := llms.CallOptions{
-		MaxTokens: 2000,
-		TopP: 0.5,
-		Temperature: 0.5,
-		StopWords: []string{},
+		CandidateCount: 3,
+		// MaxTokens: 2000,
+		// TopP: 1,
+		// TopK: 0,
+		// Temperature: 0.5,
+		// CandidateCount: 1,
+		// StopWords: []string{},
 	}
 
-	resp, err := c.CreateCompletion(context.Background(), modelId, []Message{msg}, opts)
+	resp, err := c.CreateCompletion(context.Background(), modelId, msg, opts)
 	if err != nil {
 		t.Fatal(err)
 	}
 	
-	for _, choice := range resp.Choices {
-		fmt.Printf("%+v\n", choice.Content)
+	for i, choice := range resp.Choices {
+		fmt.Printf("\n\nOutput %d:\n%+v\n", i, choice.Content)
 	}
 }
 
@@ -51,16 +57,16 @@ func TestFetchAnthropicOutput(t *testing.T) {
 	client := bedrockruntime.NewFromConfig(cfg)
 
 	msg := Message{
-		Role: "user",
+		Role: schema.ChatMessageTypeHuman,
 		Content: "Who is the second president of the United States?",
 		Type: "text",
 	}
 
 	opts := llms.CallOptions{
-		MaxTokens: 2000,
-		TopP: 0.5,
-		Temperature: 0.5,
-		StopWords: []string{},
+		// MaxTokens: 2000,
+		// TopP: 0.5,
+		// Temperature: 0.5,
+		// StopWords: []string{},
 	}
 
 
