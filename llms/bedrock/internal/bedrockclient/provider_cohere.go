@@ -12,6 +12,7 @@ import (
 // Ref: https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-cohere-command.html
 // Also: https://docs.cohere.com/reference/generate
 
+// cohereTextGenerationInput is the input for the text generation for Cohere Models
 type cohereTextGenerationInput struct {
 	// The prompt that you want to pass to the model. Required
 	Prompt string `json:"prompt"`
@@ -33,6 +34,17 @@ type cohereTextGenerationInput struct {
 }
 
 
+// Finish reason for the completion of the generation for Cohere Models
+const (
+	CohereCompletionReasonComplete = "COMPLETE"
+	CohereCompletionReasonMaxTokens = "MAX_TOKENS"
+	CohereCompletionReasonError = "ERROR"
+	CohereCompletionReasonErrorToxic = "ERROR_TOXIC"
+)
+
+
+
+// cohereTextGenerationOutput is the output for the text generation for Cohere Models
 type cohereTextGenerationOutput struct {
 	// The ID of the response.
 	ID string `json:"id"`
@@ -40,6 +52,8 @@ type cohereTextGenerationOutput struct {
 	Generations []*cohereTextGenerationOutputGeneration `json:"generations"`
 }
 
+
+// cohereTextGenerationOutputGeneration is the generation output for the text generation for Cohere Models
 type cohereTextGenerationOutputGeneration struct {
 	// The ID of the generation.
 	ID string `json:"id"`
