@@ -8,7 +8,7 @@ import (
 type Option func(*options)
 
 type options struct {
-	modelId         string
+	modelID         string
 	client          *bedrockruntime.Client
 	callbackHandler callbacks.Handler
 }
@@ -16,7 +16,7 @@ type options struct {
 // WithModel allows setting a custom modelId.
 func WithModel(modelID string) Option {
 	return func(o *options) {
-		o.modelId = modelID
+		o.modelID = modelID
 	}
 }
 

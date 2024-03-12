@@ -26,14 +26,14 @@ func New(opts ...Option) (*LLM, error) {
 	}
 	return &LLM{
 		client:           c,
-		modelID:          o.modelId,
+		modelID:          o.modelID,
 		CallbacksHandler: o.callbackHandler,
 	}, nil
 }
 
 func newClient(opts ...Option) (*options, *bedrockclient.Client, error) {
 	options := &options{
-		modelId: defaultModel,
+		modelID: defaultModel,
 	}
 
 	for _, opt := range opts {

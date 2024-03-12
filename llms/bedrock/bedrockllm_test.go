@@ -2,6 +2,7 @@ package bedrock_test
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -22,6 +23,10 @@ func setUpTest() (*bedrockruntime.Client, error) {
 
 func TestAmazonOutput(t *testing.T) {
 	t.Parallel()
+
+	if os.Getenv("TEST_AWS") != "true" {
+		t.Skip("Skipping test, requires AWS access")
+	}
 
 	client, err := setUpTest()
 	if err != nil {
@@ -66,18 +71,14 @@ func TestAmazonOutput(t *testing.T) {
 	ctx := context.Background()
 
 	for _, model := range models {
-		t.Log("\n--------------------------------------------------\n")
-		t.Logf("Model: %s\n", model)
+		t.Logf("Model output for %s:-", model)
 
 		resp, err := llm.GenerateContent(ctx, msgs, llms.WithModel(model), llms.WithMaxTokens(512))
 		if err != nil {
 			t.Fatal(err)
 		}
 		for i, choice := range resp.Choices {
-			t.Logf("Choice %d:-\n", i)
-			t.Logf("%s\n", choice.Content)
+			t.Logf("Choice %d: %s", i, choice.Content)
 		}
-
-		t.Log("\n--------------------------------------------------\n")
 	}
 }
