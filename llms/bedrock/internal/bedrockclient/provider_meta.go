@@ -16,13 +16,13 @@ type metaTextGenerationInput struct {
 	// The prompt that you want to pass to the model. Required
 	Prompt string  `json:"prompt"`
 	// Used to control the randomness of the generation. Optional, default = 0.5
-	Temperature float64 `json:"temperature"`
+	Temperature float64 `json:"temperature,omitempty"`
 	// Used to lower value to ignore less probable options. Optional, default = 0.9
-	TopP float64 `json:"top_p"`
+	TopP float64 `json:"top_p,omitempty"`
 	// The maximum number of tokens to generate per result.
 	// The model truncates the response once the generated text exceeds max_gen_len.
 	// Optional, default = 512
-	MaxGenLen int `json:"max_gen_len"`
+	MaxGenLen int `json:"max_gen_len,omitempty"`
 }
 
 
