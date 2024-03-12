@@ -12,7 +12,7 @@ import (
 
 // Ref: https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-titan-text.html
 
-// amazonTextGenerationConfigInput is the input for the text generation configuration for Amazon Models
+// amazonTextGenerationConfigInput is the input for the text generation configuration for Amazon Models.
 type amazonTextGenerationConfigInput struct {
 	// The maximum number of tokens to generate per result. Optional, default = 512
 	MaxTokens int `json:"maxTokenCount,omitempty"`
@@ -25,8 +25,7 @@ type amazonTextGenerationConfigInput struct {
 	StopSequences []string `json:"stopSequences,omitempty"`
 }
 
-
-// amazonTextGenerationInput is the input for the text generation for Amazon Models
+// amazonTextGenerationInput is the input for the text generation for Amazon Models.
 type amazonTextGenerationInput struct {
 	// The text which the model is requested to continue.
 	InputText string `json:"inputText"`
@@ -34,9 +33,7 @@ type amazonTextGenerationInput struct {
 	TextGenerationConfig amazonTextGenerationConfigInput `json:"textGenerationConfig"`
 }
 
-
-
-// amazonTextGenerationOutput is the output for the text generation for Amazon Models
+// amazonTextGenerationOutput is the output for the text generation for Amazon Models.
 type amazonTextGenerationOutput struct {
 	// The number of tokens in the prompt
 	InputTextTokenCount int `json:"inputTextTokenCount"`
@@ -52,10 +49,10 @@ type amazonTextGenerationOutput struct {
 	} `json:"results"`
 }
 
-// Finish reason for the completion of the generation for Amazon Models
+// Finish reason for the completion of the generation for Amazon Models.
 const (
-	AmazonCompletionReasonFinish = "FINISH"
-	AmazonCompletionReasonMaxTokens = "LENGTH"
+	AmazonCompletionReasonFinish          = "FINISH"
+	AmazonCompletionReasonMaxTokens       = "LENGTH"
 	AmazonCompletionReasonContentFiltered = "CONTENT_FILTERED"
 )
 
@@ -70,9 +67,9 @@ func createAmazonCompletion(ctx context.Context,
 	inputContent := amazonTextGenerationInput{
 		InputText: txt,
 		TextGenerationConfig: amazonTextGenerationConfigInput{
-			MaxTokens: options.MaxTokens,
-			TopP: options.TopP,
-			Temperature: options.Temperature,
+			MaxTokens:     options.MaxTokens,
+			TopP:          options.TopP,
+			Temperature:   options.Temperature,
 			StopSequences: options.StopWords,
 		},
 	}
@@ -107,10 +104,10 @@ func createAmazonCompletion(ctx context.Context,
 
 	for i, result := range output.Results {
 		contentChoices[i] = &llms.ContentChoice{
-			Content: result.OutputText,
+			Content:    result.OutputText,
 			StopReason: result.CompletionReason,
 			GenerationInfo: map[string]any{
-				"input_tokens": output.InputTextTokenCount,
+				"input_tokens":  output.InputTextTokenCount,
 				"output_tokens": result.TokenCount,
 			},
 		}

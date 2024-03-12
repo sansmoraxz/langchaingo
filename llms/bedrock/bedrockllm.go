@@ -11,12 +11,11 @@ import (
 	"github.com/tmc/langchaingo/llms/bedrock/internal/bedrockclient"
 )
 
-
 const defaultModel = "amazon.titan-text-lite-v1"
 
 type LLM struct {
-	modelId string
-	client *bedrockclient.Client
+	modelId          string
+	client           *bedrockclient.Client
 	CallbacksHandler callbacks.Handler
 }
 
@@ -26,8 +25,8 @@ func New(opts ...Option) (*LLM, error) {
 		return nil, err
 	}
 	return &LLM{
-		client: c,
-		modelId: o.modelId,
+		client:           c,
+		modelId:          o.modelId,
 		CallbacksHandler: o.callbackHandler,
 	}, nil
 }
@@ -51,8 +50,6 @@ func newClient(opts ...Option) (*options, *bedrockclient.Client, error) {
 
 	return options, bedrockclient.NewClient(options.client), nil
 }
-
-
 // Call implements llms.Model.
 func (l *LLM) Call(ctx context.Context, prompt string, options ...llms.CallOption) (string, error) {
 	return llms.GenerateFromSinglePrompt(ctx, l, prompt, options...)
@@ -77,7 +74,6 @@ func (l *LLM) GenerateContent(ctx context.Context, messages []llms.MessageConten
 	}
 
 	res, err := l.client.CreateCompletion(ctx, opts.Model, m, opts)
-
 	if err != nil {
 		if l.CallbacksHandler != nil {
 			l.CallbacksHandler.HandleLLMError(ctx, err)
@@ -92,7 +88,6 @@ func (l *LLM) GenerateContent(ctx context.Context, messages []llms.MessageConten
 	return res, nil
 }
 
-
 func processMessages(messages []llms.MessageContent) ([]bedrockclient.Message, error) {
 	bedrockMsgs := make([]bedrockclient.Message, 0, len(messages))
 
@@ -101,16 +96,16 @@ func processMessages(messages []llms.MessageContent) ([]bedrockclient.Message, e
 			switch part := part.(type) {
 			case llms.TextContent:
 				bedrockMsgs = append(bedrockMsgs, bedrockclient.Message{
-					Role: m.Role,
+					Role:    m.Role,
 					Content: part.Text,
-					Type: "text",
+					Type:    "text",
 				})
 			case llms.BinaryContent:
 				bedrockMsgs = append(bedrockMsgs, bedrockclient.Message{
-					Role: m.Role,
-					Content: string(part.Data),
+					Role:     m.Role,
+					Content:  string(part.Data),
 					MimeType: part.MIMEType,
-					Type: "image",
+					Type:     "image",
 				})
 			default:
 				return nil, errors.New("unsupported message type")

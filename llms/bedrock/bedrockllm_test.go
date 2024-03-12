@@ -26,9 +26,7 @@ var msgs []llms.MessageContent = []llms.MessageContent{
 		},
 	},
 }
-
-
-// All the test models
+// All the test models.
 var models = []string{
 	bedrock.ModelAi21J2MidV1,
 	bedrock.ModelAi21J2UltraV1,
@@ -66,7 +64,6 @@ func TestAmazonOutput(t *testing.T) {
 	ctx := context.Background()
 
 	for _, model := range models {
-
 		fmt.Println("--------------------------------------------------")
 		fmt.Printf("Model: %s\n", model)
 

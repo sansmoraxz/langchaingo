@@ -10,8 +10,6 @@ import (
 )
 
 // Ref: https://docs.ai21.com/reference/j2-complete-ref
-
-
 type ai21TextGenerationInput struct {
 	// The text which the model is requested to continue.
 	Prompt string `json:"prompt"`
@@ -40,8 +38,6 @@ type ai21TextGenerationInput struct {
 	// The number of results to generate. Optional, default = 1
 	NumResults int `json:"numResults,omitempty"`
 }
-
-
 type ai21TextGenerationOutput struct {
 	// The ID of the request
 	ID any `json:"id"` // Docs say it's a string, got number
@@ -72,22 +68,19 @@ type ai21TextGenerationOutput struct {
 	} `json:"completions"`
 }
 
-
-// Finish reason for the completion of the generation for AI21 Models
+// Finish reason for the completion of the generation for AI21 Models.
 const (
-	Ai21CompletionReasonLength = "length"
-	Ai21CompletionReasonStop = "stop"
+	Ai21CompletionReasonLength    = "length"
+	Ai21CompletionReasonStop      = "stop"
 	Ai21CompletionReasonEndOfText = "endoftext"
 )
-
-
 func createAi21Completion(ctx context.Context, client *bedrockruntime.Client, modelID string, messages []Message, options llms.CallOptions) (*llms.ContentResponse, error) {
 	txt := processInputMessagesGeneric(messages)
 	inputContent := ai21TextGenerationInput{
-		Prompt: txt,
-		Temperature: options.Temperature,
-		TopP: options.TopP,
-		MaxTokens: options.MaxTokens,
+		Prompt:        txt,
+		Temperature:   options.Temperature,
+		TopP:          options.TopP,
+		MaxTokens:     options.MaxTokens,
 		StopSequences: options.StopWords,
 		CountPenalty: struct {
 			Scale float64 `json:"scale"`
@@ -107,8 +100,8 @@ func createAi21Completion(ctx context.Context, client *bedrockruntime.Client, mo
 	}
 
 	modelInput := bedrockruntime.InvokeModelInput{
-		ModelId: aws.String(modelID),
-		Body:    body,
+		ModelId:     aws.String(modelID),
+		Body:        body,
 		Accept:      aws.String("*/*"),
 		ContentType: aws.String("application/json"),
 	}
@@ -127,11 +120,11 @@ func createAi21Completion(ctx context.Context, client *bedrockruntime.Client, mo
 	choices := make([]*llms.ContentChoice, len(output.Completions))
 	for i, completion := range output.Completions {
 		choices[i] = &llms.ContentChoice{
-			Content: completion.Data.Text,
+			Content:    completion.Data.Text,
 			StopReason: completion.FinishReason.Reason,
 			GenerationInfo: map[string]any{
-				"id": output.ID,
-				"input_tokens": len(output.Prompt.Tokens),
+				"id":            output.ID,
+				"input_tokens":  len(output.Prompt.Tokens),
 				"output_tokens": len(completion.Data.Tokens),
 			},
 		}

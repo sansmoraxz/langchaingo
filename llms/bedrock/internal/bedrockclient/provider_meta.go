@@ -11,10 +11,10 @@ import (
 
 // Ref: https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-meta.html
 
-// metaTextGenerationInput is the input to the model
+// metaTextGenerationInput is the input to the model.
 type metaTextGenerationInput struct {
 	// The prompt that you want to pass to the model. Required
-	Prompt string  `json:"prompt"`
+	Prompt string `json:"prompt"`
 	// Used to control the randomness of the generation. Optional, default = 0.5
 	Temperature float64 `json:"temperature,omitempty"`
 	// Used to lower value to ignore less probable options. Optional, default = 0.9
@@ -24,9 +24,7 @@ type metaTextGenerationInput struct {
 	// Optional, default = 512
 	MaxGenLen int `json:"max_gen_len,omitempty"`
 }
-
-
-// metaTextGenerationOutput is the output from the model
+// metaTextGenerationOutput is the output from the model.
 type metaTextGenerationOutput struct {
 	// The generated text.
 	Generation string `json:"generation"`
@@ -39,9 +37,9 @@ type metaTextGenerationOutput struct {
 	StopReason string `json:"stop_reason"`
 }
 
-// Finish reason for the completion of the generation
+// Finish reason for the completion of the generation.
 const (
-	MetaCompletionReasonStop = "stop"
+	MetaCompletionReasonStop   = "stop"
 	MetaCompletionReasonLength = "length"
 )
 
@@ -54,20 +52,19 @@ func createMetaCompletion(ctx context.Context,
 	txt := processInputMessagesGeneric(messages)
 
 	input := &metaTextGenerationInput{
-		Prompt: txt,
+		Prompt:      txt,
 		Temperature: options.Temperature,
-		TopP: options.TopP,
-		MaxGenLen: options.MaxTokens,
+		TopP:        options.TopP,
+		MaxGenLen:   options.MaxTokens,
 	}
 
 	body, err := json.Marshal(input)
-
 	if err != nil {
 		return nil, err
 	}
 
 	modelInput := &bedrockruntime.InvokeModelInput{
-		ModelId: aws.String(modelID),
+		ModelId:     aws.String(modelID),
 		Accept:      aws.String("*/*"),
 		ContentType: aws.String("application/json"),
 		Body:        body,
@@ -88,14 +85,13 @@ func createMetaCompletion(ctx context.Context,
 	return &llms.ContentResponse{
 		Choices: []*llms.ContentChoice{
 			{
-				Content: output.Generation,
+				Content:    output.Generation,
 				StopReason: output.StopReason,
 				GenerationInfo: map[string]interface{}{
-					"input_tokens": output.PromptTokenCount,
+					"input_tokens":  output.PromptTokenCount,
 					"output_tokens": output.GenerationTokenCount,
 				},
 			},
 		},
 	}, nil
-
 }

@@ -15,7 +15,7 @@ type Client struct {
 }
 
 type Message struct {
-	Role schema.ChatMessageType
+	Role    schema.ChatMessageType
 	Content string
 	// Type may be "text" or "image"
 	Type string
@@ -26,8 +26,6 @@ type Message struct {
 func getProvider(modelID string) string {
 	return strings.Split(modelID, ".")[0]
 }
-
-
 func NewClient(client *bedrockruntime.Client) *Client {
 	return &Client{
 		client: client,
@@ -55,7 +53,6 @@ func (c *Client) CreateCompletion(ctx context.Context,
 		return nil, errors.New("unsupported provider")
 	}
 }
-
 
 func processInputMessagesGeneric(messages []Message) string {
 	var sb strings.Builder

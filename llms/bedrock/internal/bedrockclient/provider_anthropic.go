@@ -14,7 +14,7 @@ import (
 // Ref: https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-anthropic-claude-messages.html
 // Also: https://docs.anthropic.com/claude/reference/messages_post
 
-// anthropicBinGenerationInputSource is the source of the content
+// anthropicBinGenerationInputSource is the source of the content.
 type anthropicBinGenerationInputSource struct {
 	// The type of the source. Required
 	// One of: "base64"
@@ -27,7 +27,7 @@ type anthropicBinGenerationInputSource struct {
 	Data string `json:"data"`
 }
 
-// anthropicTextGenerationInputContent is a single message in the input
+// anthropicTextGenerationInputContent is a single message in the input.
 type anthropicTextGenerationInputContent struct {
 	// The type of the content. Required.
 	// One of: "text", "image"
@@ -46,9 +46,7 @@ type anthropicTextGenerationInputMessage struct {
 	// The content of the message. Required
 	Content []anthropicTextGenerationInputContent `json:"content"`
 }
-
-
-// anthropicTextGenerationInput is the input to the model
+// anthropicTextGenerationInput is the input to the model.
 type anthropicTextGenerationInput struct {
 	// The version of the model to use. Required
 	AnthropicVersion string `json:"anthropic_version"`
@@ -70,8 +68,7 @@ type anthropicTextGenerationInput struct {
 	StopSequences []string `json:"stop_sequences,omitempty"`
 }
 
-
-// anthropicTextGenerationOutput is the generated output
+// anthropicTextGenerationOutput is the generated output.
 type anthropicTextGenerationOutput struct {
 	// Type of the content.
 	// For messages, it is "message"
@@ -90,39 +87,36 @@ type anthropicTextGenerationOutput struct {
 	StopReason string `json:"stop_reason"`
 	// Which custom stop sequence was matched, if any.
 	StopSequence string `json:"stop_sequence"`
-	Usage struct {
-		InputTokens int `json:"input_tokens"`
+	Usage        struct {
+		InputTokens  int `json:"input_tokens"`
 		OutputTokens int `json:"output_tokens"`
 	} `json:"usage"`
 }
 
-
-// Finish reason for the completion of the generation
+// Finish reason for the completion of the generation.
 const (
-	AnthropicCompletionReasonEndTurn = "end_turn"
-	AnthropicCompletionReasonMaxTokens = "max_tokens"
+	AnthropicCompletionReasonEndTurn      = "end_turn"
+	AnthropicCompletionReasonMaxTokens    = "max_tokens"
 	AnthropicCompletionReasonStopSequence = "stop_sequence"
 )
 
-// The latest version of the model
+// The latest version of the model.
 const (
 	AnthropicLatestVersion = "bedrock-2023-05-31"
 )
 
-// Role attribute for the anthropic message
+// Role attribute for the anthropic message.
 const (
-	AnthropicSystem = "system"
-	AnthropicRoleUser = "user"
+	AnthropicSystem        = "system"
+	AnthropicRoleUser      = "user"
 	AnthropicRoleAssistant = "assistant"
 )
 
-// Type attribute for the anthropic message
+// Type attribute for the anthropic message.
 const (
-	AnthropicMessageTypeText = "text"
+	AnthropicMessageTypeText  = "text"
 	AnthropicMessageTypeImage = "image"
 )
-
-
 func createAnthropicCompletion(ctx context.Context,
 	client *bedrockruntime.Client,
 	modelID string,
@@ -136,13 +130,13 @@ func createAnthropicCompletion(ctx context.Context,
 
 	input := anthropicTextGenerationInput{
 		AnthropicVersion: AnthropicLatestVersion,
-		MaxTokens: options.MaxTokens | 200, // this is a required field
-		System: systemPrompt,
-		Messages: inputContents,
-		Temperature: options.Temperature,
-		TopP: options.TopP,
-		TopK: options.TopK,
-		StopSequences: options.StopWords,
+		MaxTokens:        options.MaxTokens | 200, // this is a required field
+		System:           systemPrompt,
+		Messages:         inputContents,
+		Temperature:      options.Temperature,
+		TopP:             options.TopP,
+		TopK:             options.TopK,
+		StopSequences:    options.StopWords,
 	}
 
 	body, err := json.Marshal(input)
@@ -175,10 +169,10 @@ func createAnthropicCompletion(ctx context.Context,
 	Contentchoices := make([]*llms.ContentChoice, len(output.Content))
 	for i, c := range output.Content {
 		Contentchoices[i] = &llms.ContentChoice{
-			Content: c.Text,
+			Content:    c.Text,
 			StopReason: output.StopReason,
 			GenerationInfo: map[string]interface{}{
-				"input_tokens": output.Usage.InputTokens,
+				"input_tokens":  output.Usage.InputTokens,
 				"output_tokens": output.Usage.OutputTokens,
 			},
 		}
@@ -187,10 +181,8 @@ func createAnthropicCompletion(ctx context.Context,
 		Choices: Contentchoices,
 	}, nil
 }
-
-
 // process the input messages to anthropic supported input
-// returns the input content and system prompt
+// returns the input content and system prompt.
 func processInputMessagesAnthropic(messages []Message) ([]*anthropicTextGenerationInputMessage, string, error) {
 	inputContents := make([]*anthropicTextGenerationInputMessage, 0, len(messages))
 	var systemPrompt string
@@ -216,8 +208,7 @@ func processInputMessagesAnthropic(messages []Message) ([]*anthropicTextGenerati
 	return inputContents, systemPrompt, nil
 }
 
-
-// process the role of the message to anthropic supported role
+// process the role of the message to anthropic supported role.
 func getAnthropicRole(role schema.ChatMessageType) (string, error) {
 	switch role {
 	case schema.ChatMessageTypeSystem:

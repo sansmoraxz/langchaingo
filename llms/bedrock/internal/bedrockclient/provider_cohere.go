@@ -12,7 +12,7 @@ import (
 // Ref: https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-cohere-command.html
 // Also: https://docs.cohere.com/reference/generate
 
-// cohereTextGenerationInput is the input for the text generation for Cohere Models
+// cohereTextGenerationInput is the input for the text generation for Cohere Models.
 type cohereTextGenerationInput struct {
 	// The prompt that you want to pass to the model. Required
 	Prompt string `json:"prompt"`
@@ -29,31 +29,25 @@ type cohereTextGenerationInput struct {
 	MaxTokens int `json:"max_tokens,omitempty"`
 	// Configure up to four sequences that the model recognizes. After a stop sequence, the model stops generating further tokens.
 	// The returned text doesn't contain the stop sequence.
-	StopSequences []string `json:"stop_sequences,omitempty"`
-	NumGenerations int `json:"num_generations,omitempty"`
+	StopSequences  []string `json:"stop_sequences,omitempty"`
+	NumGenerations int      `json:"num_generations,omitempty"`
 }
-
-
-// Finish reason for the completion of the generation for Cohere Models
+// Finish reason for the completion of the generation for Cohere Models.
 const (
-	CohereCompletionReasonComplete = "COMPLETE"
-	CohereCompletionReasonMaxTokens = "MAX_TOKENS"
-	CohereCompletionReasonError = "ERROR"
+	CohereCompletionReasonComplete   = "COMPLETE"
+	CohereCompletionReasonMaxTokens  = "MAX_TOKENS"
+	CohereCompletionReasonError      = "ERROR"
 	CohereCompletionReasonErrorToxic = "ERROR_TOXIC"
 )
 
-
-
-// cohereTextGenerationOutput is the output for the text generation for Cohere Models
+// cohereTextGenerationOutput is the output for the text generation for Cohere Models.
 type cohereTextGenerationOutput struct {
 	// The ID of the response.
 	ID string `json:"id"`
 	// The generations of the response.
 	Generations []*cohereTextGenerationOutputGeneration `json:"generations"`
 }
-
-
-// cohereTextGenerationOutputGeneration is the generation output for the text generation for Cohere Models
+// cohereTextGenerationOutputGeneration is the generation output for the text generation for Cohere Models.
 type cohereTextGenerationOutputGeneration struct {
 	// The ID of the generation.
 	ID string `json:"id"`
@@ -74,12 +68,12 @@ func createCohereCompletion(ctx context.Context,
 	txt := processInputMessagesGeneric(messages)
 
 	input := &cohereTextGenerationInput{
-		Prompt: txt,
-		Temperature: options.Temperature,
-		P: options.TopP,
-		K: options.TopK,
-		MaxTokens: options.MaxTokens,
-		StopSequences: options.StopWords,
+		Prompt:         txt,
+		Temperature:    options.Temperature,
+		P:              options.TopP,
+		K:              options.TopK,
+		MaxTokens:      options.MaxTokens,
+		StopSequences:  options.StopWords,
 		NumGenerations: options.CandidateCount,
 	}
 
@@ -95,7 +89,6 @@ func createCohereCompletion(ctx context.Context,
 		Body:        body,
 	}
 	resp, err := client.InvokeModel(ctx, modelInput)
-
 	if err != nil {
 		return nil, err
 	}
@@ -111,11 +104,11 @@ func createCohereCompletion(ctx context.Context,
 
 	for i, gen := range output.Generations {
 		choices[i] = &llms.ContentChoice{
-			Content: gen.Text,
+			Content:    gen.Text,
 			StopReason: gen.FinishReason,
 			GenerationInfo: map[string]interface{}{
 				"generation_id": gen.ID,
-				"index": i,
+				"index":         i,
 			},
 		}
 	}
